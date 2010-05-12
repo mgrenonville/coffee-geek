@@ -12,7 +12,7 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class CoffeeRepository implements Serializable {
-	private static final PersistenceManagerFactory pmfInstance = JDOHelper
+	private static transient final PersistenceManagerFactory pmfInstance = JDOHelper
 			.getPersistenceManagerFactory("transactions-optional");
 
 	public void save(Coffee bean) {
