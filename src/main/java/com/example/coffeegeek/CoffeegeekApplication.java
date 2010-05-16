@@ -1,16 +1,12 @@
 package com.example.coffeegeek;
 
-import java.util.Collection;
-
-import com.example.coffeegeek.model.Coffee;
 import com.example.coffeegeek.repository.CoffeeRepository;
-import com.example.coffeegeek.view.coffee.CoffeeContainer;
 import com.example.coffeegeek.view.coffee.CoffeeForm;
+import com.example.coffeegeek.view.coffee.CoffeeList;
 import com.google.inject.Inject;
 import com.vaadin.Application;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.Button.ClickEvent;
 
@@ -26,24 +22,20 @@ public class CoffeegeekApplication extends Application {
 	@Inject
 	private CoffeeForm coffeeView;
 
+	@Inject
+	protected CoffeeList coffeeList;
+
 	@Override
 	public void init() {
-
-		final Coffee bean = new Coffee();
-
-		coffeeView.setCoffee(bean);
 
 		HorizontalLayout buttons = new HorizontalLayout();
 		buttons.setSpacing(true);
 
-		final Table coffeeList = new Table();
-		updateTable(coffeeList);
 		Button apply = new Button("Apply", new Button.ClickListener() {
 			public void buttonClick(ClickEvent event) {
 				try {
 					coffeeView.commit();
-					coffeeRepository.save(bean);
-					updateTable(coffeeList);
+					// coffeeList.updateTable();
 
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -60,11 +52,4 @@ public class CoffeegeekApplication extends Application {
 		setMainWindow(mainWindow);
 	}
 
-	private void updateTable(final Table coffeeList) {
-		Collection<Coffee> findAll = coffeeRepository.findAll();
-		if (findAll != null && !findAll.isEmpty()) {
-			CoffeeContainer newDataSource = new CoffeeContainer(findAll);
-			coffeeList.setContainerDataSource(newDataSource);
-		}
-	}
 }

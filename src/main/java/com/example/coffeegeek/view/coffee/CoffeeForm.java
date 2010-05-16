@@ -4,6 +4,8 @@ import java.util.Arrays;
 
 import com.example.coffeegeek.model.Coffee;
 import com.example.coffeegeek.model.RoastDegree;
+import com.example.coffeegeek.repository.CoffeeRepository;
+import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItem;
@@ -15,6 +17,11 @@ import com.vaadin.ui.NativeSelect;
 
 @Singleton
 public class CoffeeForm extends Form {
+
+	private Coffee coffee;
+
+	@Inject
+	private CoffeeRepository coffeeRepository;
 
 	private class CoffeeFormFactory extends DefaultFieldFactory {
 		@Override
@@ -39,14 +46,21 @@ public class CoffeeForm extends Form {
 	public CoffeeForm() {
 		setCaption("Détails du café");
 		setFormFieldFactory(new CoffeeFormFactory());
+		setCoffee(new Coffee());
 
 	}
 
+	@Override
+	public void commit() throws SourceException {
+		super.commit();
+		coffeeRepository.save(coffee);
+	}
+
 	public void setCoffee(Coffee coffee) {
+		this.coffee = coffee;
 		BeanItem<Coffee> item = new BeanItem<Coffee>(coffee);
 		setItemDataSource(item);
 		setVisibleItemProperties(Arrays.asList(new String[] { "name",
 				"country", "date", "degree" }));
-
 	}
 }
