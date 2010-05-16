@@ -282,11 +282,11 @@ public class GAEGuiceApplicationServlet extends GuiceApplicationServlet {
 		} catch (NotSerializableException e) {
 			// TODO this notification is usually not shown - should we redirect
 			// in some other way - can we?
-			sendNotSerializableNotification(request, response);
 			log.severe("NotSerializableException: " + getStackTraceAsString(e));
+			sendNotSerializableNotification(request, response);
 		} catch (Exception e) {
-			sendCriticalErrorNotification(request, response);
 			log.severe(e + ": " + getStackTraceAsString(e));
+			sendCriticalErrorNotification(request, response);
 		} finally {
 			// "Next, please!"
 			if (locked) {
