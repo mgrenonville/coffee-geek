@@ -1,6 +1,7 @@
 package com.example.coffeegeek.view.coffee;
 
 import java.util.Arrays;
+import java.util.logging.Logger;
 
 import com.example.coffeegeek.model.Coffee;
 import com.example.coffeegeek.model.RoastDegree;
@@ -17,6 +18,8 @@ import com.vaadin.ui.NativeSelect;
 
 @Singleton
 public class CoffeeForm extends Form {
+
+	protected static Logger log = Logger.getLogger(CoffeeForm.class.getName());
 
 	private Coffee coffee;
 
@@ -52,8 +55,16 @@ public class CoffeeForm extends Form {
 
 	@Override
 	public void commit() throws SourceException {
+		Item value = getItemDataSource();
+		log.info("value : " + value);
+		log.info("valueClass : " + value.getClass());
+		if (value instanceof BeanItem<?>) {
+			coffee = (Coffee) ((BeanItem) value).getBean();
+			coffeeRepository.saveOrUpdate(coffee);
+		}
 		super.commit();
-		coffeeRepository.save(coffee);
+		// coffeeRepository.saveOrUpdate();
+
 	}
 
 	public void setCoffee(Coffee coffee) {

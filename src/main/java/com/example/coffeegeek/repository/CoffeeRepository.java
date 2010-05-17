@@ -2,7 +2,9 @@ package com.example.coffeegeek.repository;
 
 import java.io.Serializable;
 import java.util.Collection;
+import java.util.logging.Logger;
 
+import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManager;
 import javax.jdo.PersistenceManagerFactory;
 import javax.jdo.Query;
@@ -13,6 +15,9 @@ import com.google.inject.Singleton;
 
 @Singleton
 public class CoffeeRepository implements Serializable {
+
+	protected static Logger log = Logger.getLogger(CoffeeRepository.class
+			.getName());
 
 	private static transient PersistenceManagerFactory pmfInstance;
 
@@ -51,6 +56,19 @@ public class CoffeeRepository implements Serializable {
 		Query newQuery = persistenceManager.newQuery(Coffee.class);
 		newQuery.setResult("uuid");
 		return (Collection<Long>) newQuery.execute();
+	}
+
+	public void saveOrUpdate(Coffee coffee) {
+		log.info("saveOrUpdate : " + coffee);
+		log.info("state : " + JDOHelper.getObjectState(coffee));
+		PersistenceManager persistenceManager = pmfInstance
+				.getPersistenceManager();
+		try {
+			persistenceManager.makePersistent(coffee);
+		} finally {
+			persistenceManager.close();
+		}
+
 	}
 
 }

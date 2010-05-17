@@ -3,6 +3,7 @@ package com.example.coffeegeek.view.coffee;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+import com.example.coffeegeek.vaadin.RepositoryContainer;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
 import com.vaadin.data.Item;
@@ -17,8 +18,9 @@ public class CoffeeList extends Table {
 	private final CoffeeForm coffeeForm;
 
 	@Inject
-	public CoffeeList(CoffeeForm coffeeForm, CoffeeContainer container) {
+	public CoffeeList(CoffeeForm coffeeForm, RepositoryContainer container) {
 		this.coffeeForm = coffeeForm;
+
 		setSelectable(true);
 		setImmediate(true);
 		setContainerDataSource(container);
@@ -31,6 +33,7 @@ public class CoffeeList extends Table {
 				if (property == CoffeeList.this) {
 					Item item = CoffeeList.this.getItem(CoffeeList.this
 							.getValue());
+
 					log.info("item  : " + item);
 					if (item != CoffeeList.this.coffeeForm.getItemDataSource()) {
 						log.info("Update form : " + item);
@@ -45,6 +48,12 @@ public class CoffeeList extends Table {
 		});
 	}
 
+	@Override
+	public void setValue(Object newValue) throws ReadOnlyException,
+			ConversionException {
+		log.info("setValue");
+		super.setValue(newValue);
+	}
 	// public void updateTable() {
 	// Collection<Coffee> findAll = coffeeRepository.findAll();
 	// if (findAll != null && !findAll.isEmpty()) {

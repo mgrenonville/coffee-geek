@@ -23,7 +23,6 @@ public class CoffeeContainer extends BeanItemContainer<Coffee> {
 		for (Coffee coffee : findAll) {
 			this.addBean(coffee);
 		}
-
 	}
 
 }

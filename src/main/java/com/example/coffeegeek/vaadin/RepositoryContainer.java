@@ -1,7 +1,9 @@
 package com.example.coffeegeek.vaadin;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -17,6 +19,8 @@ import com.google.inject.Inject;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.Container.ItemSetChangeNotifier;
+import com.vaadin.data.util.BeanItem;
 
 /**
  * This class is an attempt to implement a Container with a wrapped JDO
@@ -27,7 +31,12 @@ import com.vaadin.data.Property;
  * @author mgrenonville
  * 
  */
-public abstract class RepositoryContainer implements Container {
+public class RepositoryContainer implements Container, ItemSetChangeNotifier {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 5739630717144699155L;
+
 	protected static Logger log = Logger.getLogger(RepositoryContainer.class
 			.getName());
 
@@ -38,6 +47,8 @@ public abstract class RepositoryContainer implements Container {
 	private Map<String, Class<?>> properties = new HashMap<String, Class<?>>();
 
 	protected CoffeeRepository coffeeRepository;
+
+	private LinkedList<ItemSetChangeListener> itemSetChangeListeners;
 
 	@Inject
 	public RepositoryContainer(PersistenceManagerFactory pmfInstance,
@@ -50,14 +61,20 @@ public abstract class RepositoryContainer implements Container {
 			properties.put(memberMetadata.getName(), memberMetadata.getClass());
 		}
 
-		new MapMaker().makeComputingMap(new Function<Object, Item>() {
+		initItemCache();
+	}
 
-			public Item apply(Object itemId) {
-				log.info("loading entity " + itemId);
-				return new EntityItem(RepositoryContainer.this.coffeeRepository
-						.find((Long) itemId), properties);
-			}
-		});
+	private void initItemCache() {
+		itemCache = new MapMaker()
+				.makeComputingMap(new Function<Object, Item>() {
+
+					public Item apply(Object itemId) {
+						log.info("loading entity " + itemId);
+						return new BeanItem(
+								RepositoryContainer.this.coffeeRepository
+										.find((Long) itemId));
+					}
+				});
 	}
 
 	public boolean addContainerProperty(Object propertyId, Class<?> type,
@@ -78,7 +95,6 @@ public abstract class RepositoryContainer implements Container {
 	}
 
 	public Property getContainerProperty(Object itemId, Object propertyId) {
-		log.info("getContainerProperty() : ");
 		return getItem(itemId).getItemProperty(propertyId);
 	}
 
@@ -87,13 +103,10 @@ public abstract class RepositoryContainer implements Container {
 	}
 
 	public Item getItem(Object itemId) {
-		log.info("getItem() : " + itemId);
-		return new EntityItem(RepositoryContainer.this.coffeeRepository
-				.find((Long) itemId), properties);
+		return itemCache.get(itemId);
 	}
 
 	public Collection<?> getItemIds() {
-		log.info("getItemIds() : ");
 		return coffeeRepository.findAllIds();
 	}
 
@@ -116,8 +129,49 @@ public abstract class RepositoryContainer implements Container {
 	}
 
 	public int size() {
-		log.info("size() : ");
-		return getContainerPropertyIds().size();
+		int size = getItemIds().size();
+		log.info("size() : " + size);
+		return size;
+	}
+
+	private void writeObject(java.io.ObjectOutputStream stream)
+			throws IOException {
+		stream.defaultWriteObject();
+
+	}
+
+	private void readObject(java.io.ObjectInputStream stream)
+			throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		initItemCache();
+		fireItemSetChange();
+	}
+
+	public void addListener(ItemSetChangeListener listener) {
+		log.info("adding Listener");
+		if (itemSetChangeListeners == null) {
+			itemSetChangeListeners = new LinkedList<ItemSetChangeListener>();
+		}
+		itemSetChangeListeners.add(listener);
+	}
+
+	public void removeListener(ItemSetChangeListener listener) {
+		if (itemSetChangeListeners != null) {
+			itemSetChangeListeners.remove(listener);
+		}
+	}
+
+	private void fireItemSetChange() {
+		if (itemSetChangeListeners != null) {
+			final Container.ItemSetChangeEvent event = new Container.ItemSetChangeEvent() {
+				public Container getContainer() {
+					return RepositoryContainer.this;
+				}
+			};
+			for (ItemSetChangeListener listener : itemSetChangeListeners) {
+				listener.containerItemSetChange(event);
+			}
+		}
 	}
 
 }

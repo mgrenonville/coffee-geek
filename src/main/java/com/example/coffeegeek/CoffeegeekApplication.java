@@ -35,6 +35,7 @@ public class CoffeegeekApplication extends Application {
 			public void buttonClick(ClickEvent event) {
 				try {
 					coffeeView.commit();
+
 					// coffeeList.updateTable();
 
 				} catch (Exception e) {
