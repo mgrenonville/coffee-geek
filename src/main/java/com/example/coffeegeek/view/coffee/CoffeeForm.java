@@ -55,13 +55,13 @@ public class CoffeeForm extends Form {
 
 	@Override
 	public void commit() throws SourceException {
-		Item value = getItemDataSource();
-		log.info("value : " + value);
-		log.info("valueClass : " + value.getClass());
-		if (value instanceof BeanItem<?>) {
-			coffee = (Coffee) ((BeanItem) value).getBean();
-			coffeeRepository.saveOrUpdate(coffee);
-		}
+		// Item value = getItemDataSource();
+		// log.info("value : " + value);
+		// log.info("valueClass : " + value.getClass());
+		// if (value instanceof BeanItem<?>) {
+		// coffee = (Coffee) ((BeanItem) value).getBean();
+		// coffeeRepository.saveOrUpdate(coffee);
+		// }
 		super.commit();
 		// coffeeRepository.saveOrUpdate();
 

@@ -1,6 +1,7 @@
 package com.example.coffeegeek.vaadin;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 
 import com.vaadin.data.Item;
@@ -8,12 +9,13 @@ import com.vaadin.data.Property;
 
 public class EntityItem<T> implements Item {
 
-	private final Map<String, Class<T>> properties;
-	private final T wrapped;
+	private Map<String, Class<T>> propertiesType;
+	private T wrapped;
+	private Map<Object, Property> properties = new HashMap<Object, Property>();
 
-	public EntityItem(T wrapped, Map<String, Class<T>> properties) {
-		this.wrapped = wrapped;
-		this.properties = properties;
+	public EntityItem(T cwrapped, Map<String, Class<T>> cpropertiesType) {
+		this.wrapped = cwrapped;
+		this.propertiesType = cpropertiesType;
 
 	}
 
@@ -23,12 +25,19 @@ public class EntityItem<T> implements Item {
 	}
 
 	public Property getItemProperty(Object id) {
-		return new EntityProperty(wrapped, properties.get(id.toString()), id
-				.toString());
+		return apply(id);
+	}
+
+	public Property apply(Object id) {
+		if (properties.get(id) == null) {
+			properties.put(id, new EntityProperty(wrapped, propertiesType
+					.get(id.toString()), id.toString()));
+		}
+		return properties.get(id);
 	}
 
 	public Collection<?> getItemPropertyIds() {
-		return properties.keySet();
+		return propertiesType.keySet();
 	}
 
 	public boolean removeItemProperty(Object id)

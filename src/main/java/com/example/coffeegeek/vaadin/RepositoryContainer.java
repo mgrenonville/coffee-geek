@@ -20,13 +20,10 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Container.ItemSetChangeNotifier;
-import com.vaadin.data.util.BeanItem;
 
 /**
  * This class is an attempt to implement a Container with a wrapped JDO
  * repository.
- * 
- * But it doesn't work because of Vaadin painting strategy.
  * 
  * @author mgrenonville
  * 
@@ -65,33 +62,41 @@ public class RepositoryContainer implements Container, ItemSetChangeNotifier {
 	}
 
 	private void initItemCache() {
+		log.info(" ");
 		itemCache = new MapMaker()
 				.makeComputingMap(new Function<Object, Item>() {
 
 					public Item apply(Object itemId) {
 						log.info("loading entity " + itemId);
-						return new BeanItem(
+						return new EntityItem(
 								RepositoryContainer.this.coffeeRepository
-										.find((Long) itemId));
+										.find((Long) itemId), properties);
 					}
 				});
+
 	}
 
 	public boolean addContainerProperty(Object propertyId, Class<?> type,
 			Object defaultValue) throws UnsupportedOperationException {
+
+		log.info(" ");
 		throw new UnsupportedOperationException();
 	}
 
 	public Object addItem() throws UnsupportedOperationException {
+		log.info(" ");
 		throw new UnsupportedOperationException();
 	}
 
 	public Item addItem(Object itemId) throws UnsupportedOperationException {
+		log.info(" ");
 		throw new UnsupportedOperationException();
 	}
 
 	public boolean containsId(Object itemId) {
-		return false;
+		log.info("containsId : " + itemId);
+		Coffee find = coffeeRepository.find((Long) itemId);
+		return find != null;
 	}
 
 	public Property getContainerProperty(Object itemId, Object propertyId) {
@@ -137,14 +142,14 @@ public class RepositoryContainer implements Container, ItemSetChangeNotifier {
 	private void writeObject(java.io.ObjectOutputStream stream)
 			throws IOException {
 		stream.defaultWriteObject();
-
+		log.info(" ");
 	}
 
 	private void readObject(java.io.ObjectInputStream stream)
 			throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
+		log.info(" ");
 		initItemCache();
-		fireItemSetChange();
 	}
 
 	public void addListener(ItemSetChangeListener listener) {

@@ -16,7 +16,7 @@ public class EntityProperty implements Property {
 
 	private Object beanValue;
 	private Class<?> clazzValue;
-	private boolean readOnly;
+	private boolean readOnly = false;
 	private final String propertyId;
 
 	public EntityProperty(Object bean, Class<?> clazzValue, String propertyId) {
