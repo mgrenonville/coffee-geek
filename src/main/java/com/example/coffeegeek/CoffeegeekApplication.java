@@ -1,10 +1,13 @@
 package com.example.coffeegeek;
 
+import com.example.coffeegeek.model.Coffee;
 import com.example.coffeegeek.repository.CoffeeRepository;
+import com.example.coffeegeek.vaadin.RepositoryContainer;
 import com.example.coffeegeek.view.coffee.CoffeeForm;
 import com.example.coffeegeek.view.coffee.CoffeeList;
 import com.google.inject.Inject;
 import com.vaadin.Application;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Window;
@@ -25,6 +28,9 @@ public class CoffeegeekApplication extends Application {
 	@Inject
 	protected CoffeeList coffeeList;
 
+	@Inject
+	RepositoryContainer container;
+
 	@Override
 	public void init() {
 
@@ -35,8 +41,14 @@ public class CoffeegeekApplication extends Application {
 			public void buttonClick(ClickEvent event) {
 				try {
 					coffeeView.commit();
-
+					Coffee c = (Coffee) ((BeanItem) coffeeView
+							.getItemDataSource()).getBean();
 					// coffeeList.updateTable();
+					coffeeRepository.save(c);
+					// try to find how to remove this call to
+					// fireItemSetChange...
+					container.fireItemSetChange();
+					getMainWindow().showNotification("Ok !");
 
 				} catch (Exception e) {
 					e.printStackTrace();

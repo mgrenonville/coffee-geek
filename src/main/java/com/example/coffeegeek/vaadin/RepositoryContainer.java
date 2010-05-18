@@ -16,10 +16,12 @@ import com.example.coffeegeek.repository.CoffeeRepository;
 import com.google.common.base.Function;
 import com.google.common.collect.MapMaker;
 import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Container.ItemSetChangeNotifier;
+import com.vaadin.data.util.BeanItem;
 
 /**
  * This class is an attempt to implement a Container with a wrapped JDO
@@ -28,6 +30,7 @@ import com.vaadin.data.Container.ItemSetChangeNotifier;
  * @author mgrenonville
  * 
  */
+@Singleton
 public class RepositoryContainer implements Container, ItemSetChangeNotifier {
 	/**
 	 * 
@@ -68,9 +71,9 @@ public class RepositoryContainer implements Container, ItemSetChangeNotifier {
 
 					public Item apply(Object itemId) {
 						log.info("loading entity " + itemId);
-						return new EntityItem(
+						return new BeanItem(
 								RepositoryContainer.this.coffeeRepository
-										.find((Long) itemId), properties);
+										.find((Long) itemId));
 					}
 				});
 
@@ -166,7 +169,7 @@ public class RepositoryContainer implements Container, ItemSetChangeNotifier {
 		}
 	}
 
-	private void fireItemSetChange() {
+	public void fireItemSetChange() {
 		if (itemSetChangeListeners != null) {
 			final Container.ItemSetChangeEvent event = new Container.ItemSetChangeEvent() {
 				public Container getContainer() {
